@@ -1,196 +1,166 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Proposal Website</title>
   <style>
     body {
       margin: 0;
-      height: 100vh;
+      padding: 0;
       background: black;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      overflow: hidden;
-      font-family: 'Arial', sans-serif;
       color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      overflow: hidden;
     }
-
     h1 {
-      margin-bottom: 20px;
-      text-shadow: 2px 2px 8px pink;
+      margin-top: 40px;
+      font-size: 2.5em;
+      text-shadow: 2px 2px 8px #f0f0f0;
     }
-
-    .scene {
-      position: relative;
+    svg {
       width: 400px;
       height: 300px;
-    }
-
-    .boy, .girl {
-      position: absolute;
-      bottom: 50px;
-      width: 60px;
-      height: 120px;
-      border-radius: 10px;
-    }
-
-    .boy {
-      left: 40px;
-      background: blue;
-      display: flex;
-      justify-content: center;
-      align-items: flex-end;
-    }
-
-    .boy::after {
-      content: "💐";
-      font-size: 30px;
-      position: absolute;
-      top: 10px;
-    }
-
-    .girl {
-      right: 40px;
-      background: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .girl::after {
-      content: "👱‍♀️";
-      font-size: 40px;
-      position: absolute;
-      top: -40px;
-    }
-
-    .ground {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 5px;
-      background: white;
-    }
-
-    .buttons {
       margin-top: 20px;
     }
-
-    .buttons button {
-      padding: 10px 20px;
-      margin: 0 10px;
-      font-size: 16px;
-      color: white;
+    .ground {
+      stroke: white;
+      stroke-width: 3;
+    }
+    .buttons {
+      margin-top: 30px;
+    }
+    button {
       background: red;
       border: none;
-      border-radius: 8px;
+      padding: 15px 25px;
+      color: white;
+      font-size: 18px;
+      margin: 10px;
+      border-radius: 10px;
       cursor: pointer;
     }
-
-    /* Falling hearts */
+    /* Animations */
+    .jump {
+      animation: jump 0.6s infinite alternate;
+    }
+    @keyframes jump {
+      from { transform: translateY(0); }
+      to { transform: translateY(-40px); }
+    }
     .heart {
       position: absolute;
-      top: -20px;
       font-size: 24px;
-      color: purple;
       animation: fall 5s linear infinite;
     }
-
     @keyframes fall {
-      to {
-        transform: translateY(110vh);
-      }
+      0% { transform: translateY(-50px); opacity: 1; }
+      100% { transform: translateY(100vh); opacity: 0; }
     }
-
-    /* Rain drops */
-    .raindrop {
-      position: absolute;
-      top: -20px;
-      font-size: 18px;
-      color: lightblue;
-      animation: fall 3s linear infinite;
+    .rain {
+      stroke: lightblue;
+      stroke-width: 2;
+      animation: rainFall 1s linear infinite;
+    }
+    @keyframes rainFall {
+      from { y1: 0; y2: 10; }
+      to { y1: 50; y2: 60; }
     }
   </style>
 </head>
 <body>
   <h1>Hey Arshu, will you marry me?</h1>
 
-  <div class="scene">
-    <div class="boy" id="boy"></div>
-    <div class="girl" id="girl"></div>
-    <div class="ground"></div>
-  </div>
+  <!-- Characters -->
+  <svg viewBox="0 0 400 300">
+    <!-- Ground -->
+    <line x1="0" y1="250" x2="400" y2="250" class="ground"></line>
+
+    <!-- Boy (kneeling with flowers) -->
+    <g id="boy" transform="translate(100,180)">
+      <circle cx="0" cy="-40" r="20" fill="peachpuff" /> <!-- Head -->
+      <rect x="-10" y="-20" width="20" height="40" fill="blue" /> <!-- Body -->
+      <line x1="-10" y1="20" x2="-30" y2="60" stroke="blue" stroke-width="6"/> <!-- Leg bent -->
+      <line x1="10" y1="20" x2="20" y2="50" stroke="blue" stroke-width="6"/> <!-- Leg -->
+      <line x1="-10" y1="-10" x2="-40" y2="-30" stroke="peachpuff" stroke-width="6"/> <!-- Arm -->
+      <circle cx="-45" cy="-35" r="8" fill="pink" /> <!-- Flower -->
+      <circle cx="-50" cy="-40" r="8" fill="yellow" /> <!-- Flower -->
+    </g>
+
+    <!-- Girl (standing in frock) -->
+    <g id="girl" transform="translate(280,180)">
+      <circle cx="0" cy="-60" r="20" fill="peachpuff" /> <!-- Head -->
+      <rect x="-15" y="-40" width="30" height="60" fill="white" /> <!-- Body/frock -->
+      <line x1="-15" y1="20" x2="-15" y2="60" stroke="white" stroke-width="8"/> <!-- Leg -->
+      <line x1="15" y1="20" x2="15" y2="60" stroke="white" stroke-width="8"/> <!-- Leg -->
+    </g>
+  </svg>
 
   <div class="buttons">
-    <button onclick="yesAnswer()">Yes I will</button>
-    <button onclick="noAnswer()">No, I can't</button>
+    <button onclick="yes()">Yes I will</button>
+    <button onclick="no()">No, I can't</button>
   </div>
 
   <script>
-    function yesAnswer() {
+    function yes() {
       document.body.style.background = "pink";
-      document.querySelector("h1").innerText = "Yaaay! 💖";
-
       let boy = document.getElementById("boy");
+      boy.setAttribute("transform", "translate(100,180)");
+      boy.classList.add("jump");
+
+      // Girl holds flowers
       let girl = document.getElementById("girl");
-
-      // Boy jumps happily
-      boy.style.animation = "jump 0.6s infinite alternate";
-      boy.innerHTML = "🙆";
-
-      // Girl smells flowers
-      girl.innerHTML = "💐";
+      let flower1 = document.createElementNS("http://www.w3.org/2000/svg","circle");
+      flower1.setAttribute("cx", "0");
+      flower1.setAttribute("cy", "-20");
+      flower1.setAttribute("r", "8");
+      flower1.setAttribute("fill", "pink");
+      girl.appendChild(flower1);
 
       // Falling hearts
-      setInterval(() => {
-        const heart = document.createElement('div');
-        heart.classList.add('heart');
+      for (let i=0; i<20; i++) {
+        let heart = document.createElement("div");
+        heart.classList.add("heart");
         heart.innerHTML = "💜";
-        heart.style.left = Math.random() * 100 + "vw";
-        heart.style.animationDuration = (2 + Math.random() * 3) + "s";
+        heart.style.left = Math.random()*100 + "vw";
+        heart.style.animationDuration = (Math.random()*3+2)+"s";
         document.body.appendChild(heart);
-        setTimeout(() => heart.remove(), 5000);
-      }, 300);
-    }
-
-    function noAnswer() {
-      document.body.style.background = "black";
-      document.querySelector("h1").innerText = "💔😢";
-
-      let boy = document.getElementById("boy");
-      let girl = document.getElementById("girl");
-
-      // Boy sad with dead flowers
-      boy.innerHTML = "🥀";
-      boy.style.transform = "rotateY(180deg)";
-
-      // Girl remains same
-      girl.innerHTML = "";
-
-      // Rain cloud
-      setInterval(() => {
-        const drop = document.createElement('div');
-        drop.classList.add('raindrop');
-        drop.innerHTML = "💧";
-        drop.style.left = Math.random() * 100 + "vw";
-        drop.style.animationDuration = (1 + Math.random() * 2) + "s";
-        document.body.appendChild(drop);
-        setTimeout(() => drop.remove(), 4000);
-      }, 200);
-    }
-
-    // Boy jump animation
-    const style = document.createElement("style");
-    style.innerHTML = `
-      @keyframes jump {
-        from { transform: translateY(0); }
-        to { transform: translateY(-40px); }
+        setTimeout(()=>heart.remove(),5000);
       }
-    `;
-    document.head.appendChild(style);
+    }
+
+    function no() {
+      document.body.style.background = "black";
+      let boy = document.getElementById("boy");
+      boy.innerHTML = `
+        <circle cx="0" cy="-40" r="20" fill="peachpuff" />
+        <rect x="-10" y="-20" width="20" height="40" fill="blue" />
+        <line x1="-10" y1="20" x2="-20" y2="60" stroke="blue" stroke-width="6"/>
+        <line x1="10" y1="20" x2="20" y2="60" stroke="blue" stroke-width="6"/>
+        <line x1="10" y1="-10" x2="40" y2="10" stroke="peachpuff" stroke-width="6"/>
+        <circle cx="45" cy="15" r="8" fill="brown" />
+      `;
+
+      // Cloud + rain
+      let svg = document.querySelector("svg");
+      let cloud = document.createElementNS("http://www.w3.org/2000/svg","ellipse");
+      cloud.setAttribute("cx","100");
+      cloud.setAttribute("cy","60");
+      cloud.setAttribute("rx","40");
+      cloud.setAttribute("ry","20");
+      cloud.setAttribute("fill","gray");
+      svg.appendChild(cloud);
+
+      for (let i=0;i<8;i++){
+        let drop = document.createElementNS("http://www.w3.org/2000/svg","line");
+        drop.setAttribute("x1", 80+i*5);
+        drop.setAttribute("y1", 80);
+        drop.setAttribute("x2", 80+i*5);
+        drop.setAttribute("y2", 100);
+        drop.setAttribute("class","rain");
+        svg.appendChild(drop);
+      }
+    }
   </script>
 </body>
 </html>
