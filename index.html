@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Proposal</title>
+  <title>Proposal Website</title>
   <style>
     body {
       margin: 0;
@@ -12,174 +12,142 @@
       justify-content: center;
       align-items: center;
       flex-direction: column;
-      font-family: 'Comic Sans MS', cursive, sans-serif;
       overflow: hidden;
-    }
-    h1 {
+      font-family: 'Arial', sans-serif;
       color: white;
-      margin-bottom: 20px;
-      text-shadow: 2px 2px 5px pink;
     }
+
+    h1 {
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 8px pink;
+    }
+
     .scene {
       position: relative;
-      width: 600px;
-      height: 400px;
+      width: 300px;
+      height: 300px;
     }
-    .ground {
+
+    .boy, .girl {
       position: absolute;
       bottom: 50px;
+      width: 50px;
+      height: 100px;
+    }
+
+    .boy {
+      left: 40px;
+      background: blue;
+    }
+
+    .girl {
+      right: 40px;
+      background: white;
+    }
+
+    .ground {
+      position: absolute;
+      bottom: 0;
+      left: 0;
       width: 100%;
       height: 5px;
       background: white;
     }
-    .boy, .girl {
-      position: absolute;
-      bottom: 55px;
-      width: 100px;
-      height: 200px;
-      display: flex;
-      justify-content: center;
-      align-items: flex-end;
-      flex-direction: column;
-    }
-    .boy {
-      left: 120px;
-    }
-    .girl {
-      right: 120px;
-    }
-    .boy .body, .girl .body {
-      width: 60px;
-      height: 100px;
-      background: gray;
-    }
-    .boy .head, .girl .head {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: peachpuff;
-      margin-bottom: 5px;
-    }
-    .girl .body {
-      background: white;
-    }
-    .girl .head {
-      background: #ffeb99;
-    }
-    .flowers {
-      width: 40px;
-      height: 40px;
-      background: pink;
-      border-radius: 50%;
-      position: absolute;
-      top: 120px;
-      left: 50px;
-      box-shadow: 20px 0 yellow;
-    }
+
     .buttons {
-      margin-top: 30px;
+      margin-top: 20px;
     }
+
     .buttons button {
-      background: red;
+      padding: 10px 20px;
+      margin: 0 10px;
+      font-size: 16px;
       color: white;
+      background: red;
       border: none;
-      padding: 15px 30px;
-      margin: 10px;
-      border-radius: 10px;
-      font-size: 18px;
+      border-radius: 8px;
       cursor: pointer;
     }
-    .falling {
+
+    /* Falling hearts */
+    .heart {
       position: absolute;
-      top: -50px;
-      font-size: 24px;
-      animation: fall linear infinite;
+      top: -20px;
+      font-size: 20px;
+      color: purple;
+      animation: fall 5s linear infinite;
     }
+
     @keyframes fall {
       to {
         transform: translateY(110vh);
       }
     }
-    .cloud {
+
+    /* Rain drops */
+    .raindrop {
       position: absolute;
-      top: 20px;
-      left: 200px;
-      width: 200px;
-      height: 80px;
-      background: gray;
-      border-radius: 50%;
-      box-shadow: -50px 0 gray, 50px 0 gray;
-    }
-    .rain {
-      position: absolute;
-      top: 100px;
-      left: 250px;
-      width: 5px;
-      height: 15px;
-      background: lightblue;
-      animation: rain 1s linear infinite;
-    }
-    @keyframes rain {
-      to {
-        transform: translateY(50px);
-        opacity: 0;
-      }
+      top: -20px;
+      font-size: 18px;
+      color: lightblue;
+      animation: fall 3s linear infinite;
     }
   </style>
 </head>
 <body>
-  <h1 id="message">Hey Arshu, will you marry me?</h1>
-  <div class="scene" id="scene">
-    <div class="boy">
-      <div class="head"></div>
-      <div class="body"></div>
-      <div class="flowers" id="flowers"></div>
-    </div>
-    <div class="girl">
-      <div class="head"></div>
-      <div class="body"></div>
-    </div>
+  <h1>Hey Arshu, will you marry me?</h1>
+
+  <div class="scene">
+    <div class="boy"></div>
+    <div class="girl"></div>
     <div class="ground"></div>
   </div>
+
   <div class="buttons">
     <button onclick="yesAnswer()">Yes I will</button>
     <button onclick="noAnswer()">No, I can't</button>
   </div>
 
   <script>
-    function createFalling(emoji, color) {
-      const elem = document.createElement('div');
-      elem.classList.add('falling');
-      elem.innerHTML = emoji;
-      elem.style.color = color;
-      elem.style.left = Math.random() * 100 + 'vw';
-      elem.style.animationDuration = (2 + Math.random() * 3) + 's';
-      document.body.appendChild(elem);
-      setTimeout(() => elem.remove(), 5000);
-    }
-
     function yesAnswer() {
-      document.body.style.background = 'pink';
-      document.getElementById('message').innerText = 'Yaaay! 💖';
-      document.getElementById('flowers').style.left = '0px';
-      setInterval(() => createFalling('💜', 'purple'), 300);
-      setInterval(() => createFalling('💖', 'hotpink'), 500);
+      document.body.style.background = "pink";
+      document.body.style.color = "black";
+      document.querySelector("h1").innerText = "Yaaay! 💖";
+
+      // Remove previous hearts/rain
+      document.querySelectorAll('.heart, .raindrop').forEach(el => el.remove());
+
+      // Start falling hearts
+      setInterval(() => {
+        const heart = document.createElement('div');
+        heart.classList.add('heart');
+        heart.innerHTML = "💜";
+        heart.style.left = Math.random() * 100 + "vw";
+        heart.style.animationDuration = (2 + Math.random() * 3) + "s";
+        document.body.appendChild(heart);
+
+        setTimeout(() => heart.remove(), 5000);
+      }, 300);
     }
 
     function noAnswer() {
-      document.body.style.background = 'black';
-      document.getElementById('message').innerText = '💔';
-      document.getElementById('flowers').style.background = 'brown';
-      document.getElementById('flowers').style.boxShadow = 'none';
-      const scene = document.getElementById('scene');
-      const cloud = document.createElement('div');
-      cloud.classList.add('cloud');
-      scene.appendChild(cloud);
+      document.body.style.background = "black";
+      document.body.style.color = "white";
+      document.querySelector("h1").innerText = "💔😢";
+
+      // Remove previous hearts/rain
+      document.querySelectorAll('.heart, .raindrop').forEach(el => el.remove());
+
+      // Start rain
       setInterval(() => {
-        const rain = document.createElement('div');
-        rain.classList.add('rain');
-        scene.appendChild(rain);
-        setTimeout(() => rain.remove(), 2000);
+        const drop = document.createElement('div');
+        drop.classList.add('raindrop');
+        drop.innerHTML = "💧";
+        drop.style.left = Math.random() * 100 + "vw";
+        drop.style.animationDuration = (1 + Math.random() * 2) + "s";
+        document.body.appendChild(drop);
+
+        setTimeout(() => drop.remove(), 4000);
       }, 200);
     }
   </script>
