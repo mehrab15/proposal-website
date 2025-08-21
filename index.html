@@ -46,9 +46,13 @@
     const canvas = document.getElementById("scene");
     const ctx = canvas.getContext("2d");
 
-    let boy = { x: 150, y: 300, jump: false, vy: 0 };
+    let boy = { x: 150, y: 300, vy: 0, facingGirl: true, sad: false };
     let girl = { x: 400, y: 300 };
+    let hearts = [];
+    let rains = [];
+    let jumpInterval = null;
 
+    // Draw boy
     function drawBoy() {
       // Head
       ctx.beginPath();
@@ -70,31 +74,43 @@
       ctx.lineTo(boy.x + 20, boy.y);
       ctx.stroke();
 
-      // Arm (pointing flower toward girl)
+      // Arms
+      ctx.strokeStyle = "white";
+      ctx.lineWidth = 3;
       ctx.beginPath();
-      ctx.moveTo(boy.x, boy.y - 50);
-      ctx.lineTo(boy.x + 30, boy.y - 70); // Arm towards girl
-      ctx.stroke();
+      if (boy.sad) {
+        // Arms down if sad
+        ctx.moveTo(boy.x, boy.y - 50);
+        ctx.lineTo(boy.x, boy.y - 30);
+      } else if (boy.facingGirl) {
+        // Arm towards girl with flower
+        ctx.moveTo(boy.x, boy.y - 50);
+        ctx.lineTo(boy.x + 30, boy.y - 70);
+        ctx.stroke();
 
-      // Flower
-      ctx.beginPath();
-      ctx.arc(boy.x + 30, boy.y - 70, 7, 0, Math.PI * 2);
-      ctx.fillStyle = "yellow";
-      ctx.fill();
+        // Flower
+        ctx.beginPath();
+        ctx.arc(boy.x + 30, boy.y - 70, 7, 0, Math.PI * 2);
+        ctx.fillStyle = "yellow";
+        ctx.fill();
+      } else {
+        // Back facing → no flower
+        ctx.moveTo(boy.x, boy.y - 50);
+        ctx.lineTo(boy.x - 20, boy.y - 30);
+      }
+      ctx.stroke();
     }
 
+    // Draw girl
     function drawGirl() {
-      // Head
       ctx.beginPath();
       ctx.arc(girl.x, girl.y - 60, 20, 0, Math.PI * 2);
       ctx.fillStyle = "#ffcc99";
       ctx.fill();
 
-      // Body
       ctx.fillStyle = "white";
       ctx.fillRect(girl.x - 10, girl.y - 60, 20, 40);
 
-      // Legs
       ctx.strokeStyle = "white";
       ctx.lineWidth = 5;
       ctx.beginPath();
@@ -105,6 +121,7 @@
       ctx.stroke();
     }
 
+    // Ground
     function drawGround() {
       ctx.beginPath();
       ctx.moveTo(0, 300);
@@ -114,33 +131,83 @@
       ctx.stroke();
     }
 
+    // Hearts (purple, falling)
+    function drawHearts() {
+      ctx.fillStyle = "purple";
+      hearts.forEach((h, i) => {
+        ctx.beginPath();
+        ctx.arc(h.x, h.y, 5, 0, Math.PI * 2);
+        ctx.fill();
+        h.y += 2;
+        if (h.y > 400) hearts.splice(i, 1);
+      });
+    }
+
+    // Rain cloud + rain
+    function drawRain() {
+      if (boy.sad) {
+        // Cloud above boy
+        ctx.fillStyle = "gray";
+        ctx.beginPath();
+        ctx.ellipse(boy.x, boy.y - 120, 40, 20, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Rain drops
+        ctx.fillStyle = "lightblue";
+        rains.forEach((r, i) => {
+          ctx.beginPath();
+          ctx.arc(r.x, r.y, 3, 0, Math.PI * 2);
+          ctx.fill();
+          r.y += 4;
+          if (r.y > 400) rains.splice(i, 1);
+        });
+      }
+    }
+
+    // Scene drawing
     function drawScene() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       drawGround();
       drawBoy();
       drawGirl();
+      drawHearts();
+      drawRain();
     }
 
+    // YES button → boy keeps jumping + hearts falling
     function yes() {
-      boy.jump = true;
-      boy.vy = -6; // Lower jump
+      boy.sad = false;
+      boy.facingGirl = true;
       document.body.style.backgroundColor = "pink";
-    }
 
-    function no() {
-      alert("Oh no! 😢");
-    }
-
-    function update() {
-      if (boy.jump) {
-        boy.y += boy.vy;
-        boy.vy += 0.3; // gravity
-
-        if (boy.y >= 300) {
-          boy.y = 300;
-          boy.jump = false;
-        }
+      if (!jumpInterval) {
+        jumpInterval = setInterval(() => {
+          boy.vy = -6; // jump impulse
+          hearts.push({ x: Math.random() * canvas.width, y: 0 });
+        }, 1000); // every second
       }
+    }
+
+    // NO button → boy turns back + cloud with rain
+    function no() {
+      boy.sad = true;
+      boy.facingGirl = false;
+      document.body.style.backgroundColor = "black";
+      setInterval(() => {
+        rains.push({ x: boy.x, y: boy.y - 100 });
+      }, 300); // rain drops every 0.3s
+    }
+
+    // Update loop
+    function update() {
+      // Jump physics
+      boy.y += boy.vy;
+      boy.vy += 0.3; // gravity
+      if (boy.y > 300) {
+        boy.y = 300;
+        boy.vy = 0;
+      }
+
       drawScene();
       requestAnimationFrame(update);
     }
